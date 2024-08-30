@@ -1,0 +1,21 @@
+{
+  "$schema": "https://flagd.dev/schema/v0/flags.json",
+  "flags": {
+    "use-distributed-db": {
+      "state": "ENABLED",
+      "defaultVariant": "true",
+      "variants": {
+        "true": true,
+        "false": false
+      }
+    },
+    "use-secure-protocol": {
+      "state": "ENABLED",
+      "defaultVariant": "false",
+      "variants": {
+        "true": true,
+        "false": false
+      }
+    }
+  }
+}

@@ -1,0 +1,83 @@
+version: '3.8'
+services:
+  demo:
+    ports:
+      - 3000:3000
+    build:
+      dockerfile: ./Dockerfile
+      context: ./app
+    depends_on:
+      - otel-collector
+    volumes:
+      - ./config/flags.json:/etc/flagd/flags.json
+    environment:
+      # URL of the OTLP trace enpdoint
+      # Uses protobuf over HTTP
+      # Leave blank to disable
+      - OTLP_TRACE_URL=otel-collector
+
+      # URL of the OTLP trace enpdoint
+      # Uses protobuf over HTTP
+      # Leave blank to disable
+      - OTLP_METRICS_URL=otel-collector
+      - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta
+
+      # URL of the OTLP trace enpdoint
+      # Uses protobuf over HTTP
+      # Leave blank to disable
+      - OTLP_LOGS_URL=
+
+      # This value will be used as the Authorization header
+      # Leave blank to disable
+      - OTLP_AUTHORIZATION_HEADER="Api-Token myauthorizationtoken"
+
+      # Local dev only
+      - FLAGD_RESOLVER=in-process
+      - FLAGD_OFFLINE_FLAG_SOURCE_PATH=/etc/flagd/flags.json
+      - FLAGD_SOURCE_SELECTOR=dev
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.105.0
+    restart: always
+    command: [ "--config=/etc/otel-collector-config.yaml" ]
+    volumes:
+      - ./config/collector.yaml:/etc/otel-collector-config.yaml
+    expose:
+      - "1888"   # pprof extension
+      - "8888"   # Prometheus metrics exposed by the collector
+      - "8889"   # Prometheus exporter metrics
+      - "4317"   # OTLP gRPC receiver
+    depends_on:
+      - jaeger
+      - prometheus
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.53.1
+    restart: always
+    volumes:
+      - ./config/prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.59
+    expose:
+      - '6832/udp'
+      - '4317'
+    ports:
+      - '16686:16686'
+
+  # flagd:
+  #   image: ghcr.io/open-feature/flagd:v0.11.1
+  #   command:
+  #     - start
+  #     - --cors-origin
+  #     - '*'
+  #     - --sources
+  #     - '[{"uri":"etc/flagd/flags.json","provider":"file","selector":"etc/flagd/flags.json"}]'
+  #   volumes:
+  #     - ./config/flags.json:/etc/flagd/flags.json
+  #   expose:
+  #     - 8013
+  #     - 8016
