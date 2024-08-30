@@ -68,9 +68,6 @@ app.get("/favorites", async (req, res, next) => {
       name: "favorites",
       data: {
         count: users.length,
-        name: {
-          first: "hi",
-        },
       },
       attributes: {
         "event.provider": "FEATURE_FLAG",
