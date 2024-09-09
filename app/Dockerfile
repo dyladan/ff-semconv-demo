@@ -6,4 +6,4 @@ RUN npm ci
 COPY src/ ./src/
 EXPOSE 3000
 
-ENTRYPOINT ["node", "-r", "ts-node/register", "./src/app.ts"]
+ENTRYPOINT ["node", "-r", "ts-node/register", "--require", "./src/instrumentation.ts", "./src/app.ts"]

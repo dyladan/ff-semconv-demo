@@ -1,27 +1,51 @@
 receivers:
   otlp:
     protocols:
-      grpc:
+      http:
+        endpoint: 0.0.0.0:4318
 exporters:
-  prometheus:
-    endpoint: "0.0.0.0:8889"
-  otlp/jaeger:
-    endpoint: jaeger:4317
-    tls:
-      insecure: true
+  # prometheus:
+  #   endpoint: "0.0.0.0:8889"
+  # otlp/jaeger:
+  #   endpoint: jaeger:4317
+  #   tls:
+  #     insecure: true
   debug:
+    verbosity: normal
+    # sampling_initial: 5
+  otlphttp:
+    endpoint: "${env:DT_URL}/api/v2/otlp"
+    headers:
+      Authorization: "Api-Token ${env:DT_API_TOKEN}"
 processors:
   batch:
+    # timeout: 10s
+  cumulativetodelta:
+connectors:
+  forward:
 service:
+  telemetry:
+    logs:
+      output_paths: [stdout]
+      error_output_paths: [stdout]
   pipelines:
     traces:
       receivers: [ otlp ]
       processors: [ batch ]
-      exporters: [ otlp/jaeger ]
+      exporters: [ otlphttp ]
     metrics:
       receivers: [ otlp ]
-      processors: [ batch ]
-      exporters: [ prometheus ]
-    logs:
+      processors: [ cumulativetodelta ]
+      exporters: [ otlphttp ]
+    logs/receiver:
       receivers: [ otlp ]
+      processors: [ ]
+      exporters: [ forward ]
+    logs/debug:
+      receivers: [ forward ]
+      processors: [ ]
       exporters: [ debug ]
+    logs/export:
+      receivers: [ forward ]
+      processors: [ batch ]
+      exporters: [ otlphttp ]
