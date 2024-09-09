@@ -43,8 +43,8 @@ services:
     volumes:
       - ./config/collector.yaml:/etc/otel-collector-config.yaml
     environment:
-      - DT_URL=${DT_URL}
-      - DT_API_TOKEN=${DT_API_TOKEN}
+      - OTLP_URL=${OTLP_URL}
+      - OTLP_AUTH_HEADER=${OTLP_AUTH_HEADER}
     expose:
       - "1888"   # pprof extension
       - "8888"   # Prometheus metrics exposed by the collector

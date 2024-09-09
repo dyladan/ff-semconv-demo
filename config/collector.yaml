@@ -14,9 +14,9 @@ exporters:
     verbosity: normal
     # sampling_initial: 5
   otlphttp:
-    endpoint: "${env:DT_URL}/api/v2/otlp"
+    endpoint: "${env:OTLP_URL}"
     headers:
-      Authorization: "Api-Token ${env:DT_API_TOKEN}"
+      Authorization: "${env:OTLP_AUTH_HEADER}"
 processors:
   batch:
     # timeout: 10s
