@@ -15,9 +15,10 @@ import { Resource } from "@opentelemetry/resources";
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from "@opentelemetry/semantic-conventions";
 import { SpanExporter } from "@opentelemetry/sdk-trace-node";
 
-// import { DiagConsoleLogger, DiagLogLevel, diag } from "@opentelemetry/api";
-// // Optional and only needed to see the internal diagnostic logging (during development)
-// diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
+import { DiagConsoleLogger, DiagLogLevel, diag } from "@opentelemetry/api";
+// Optional and only needed to see the internal diagnostic logging (during development)
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
+console.log("loading instrumentation");
 
 const resource = Resource.default()
   .merge(
